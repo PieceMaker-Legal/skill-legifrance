@@ -11,7 +11,6 @@ from tools.code_parser import parse_code_query
 from tools.handlers import handle_search_cour_cassation
 from tools.legifrance_client import LegifranceClient
 from tools.query_parser import build_search_payload_champs, parse_query
-from tools.research_corpus import _search_query
 
 
 def search_result(text_id):
@@ -164,30 +163,6 @@ class QueryBooleanTest(unittest.TestCase):
         criteria = search.call_args.kwargs["criteres"]
         self.assertEqual(
             [[item["valeur"] for item in clause] for clause in criteria.clauses],
-            [["A", "B"], ["C"]],
-        )
-
-    def test_corpus_transmet_et_pagine_un_plan_mixte(self):
-        class CorpusClient:
-            def __init__(self):
-                self.calls = []
-
-            def search_with_criteres(self, **kwargs):
-                self.calls.append(kwargs)
-                return {
-                    "totalResultNumber": 2,
-                    "results": [search_result("AB"), search_result("C")],
-                }
-
-        client = CorpusClient()
-        results, report = _search_query(
-            client, "A ET B OU C", "cassation", None, None, 100
-        )
-        self.assertEqual([item["titles"][0]["id"] for item in results], ["AB", "C"])
-        self.assertFalse(report["tronquee"])
-        self.assertEqual(
-            [[item["valeur"] for item in clause]
-            for clause in client.calls[0]["criteres"].clauses],
             [["A", "B"], ["C"]],
         )
 

@@ -73,6 +73,21 @@ class SkillFormatTest(unittest.TestCase):
         }
         self.assertTrue(set(meta) <= allowed, set(meta) - allowed)
         self.assertIn("${CLAUDE_SKILL_DIR}", text)
+        self.assertIn("references/installation.md", text)
+        self.assertNotIn("piste.gouv.fr", text.split("---", 2)[-1])
+        self.assertNotIn("--client-secret", text)
+        self.assertNotIn("## Client PISTE", text)
+
+    def test_installation_md_porte_le_setup(self):
+        path = ROOT / "references" / "installation.md"
+        self.assertTrue(path.is_file(), path)
+        text = path.read_text(encoding="utf-8")
+        self.assertIn("${CLAUDE_SKILL_DIR}", text)
+        self.assertIn("scripts/legifrance.py setup", text)
+        self.assertIn("piste.gouv.fr", text)
+        self.assertIn("--client-secret", text)
+        self.assertIn("~/.config/skill-legifrance/.env", text)
+        self.assertNotIn("mcp-legifrance", text)
 
     def test_plugin_et_marketplace_claude_code(self):
         plugin = json.loads(PLUGIN.read_text(encoding="utf-8"))

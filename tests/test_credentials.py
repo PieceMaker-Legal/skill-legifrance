@@ -114,6 +114,30 @@ class CredentialsTest(unittest.TestCase):
         self.assertIn("LEGIFRANCE_CLIENT_ID=nouveau", text)
         self.assertNotIn("ancien", text)
 
+    def test_aucun_fichier_mcp_n_est_relu(self):
+        self.assertFalse(hasattr(credentials, "MCP_ENV_FILE"))
+        with tempfile.TemporaryDirectory() as tmp:
+            skill_dir = Path(tmp) / "skill-legifrance"
+            mcp_env = Path(tmp) / "mcp-legifrance" / ".env"
+            skill_dir.mkdir()
+            mcp_env.parent.mkdir()
+            mcp_env.write_text(
+                "LEGIFRANCE_CLIENT_ID=mcp-id\nLEGIFRANCE_CLIENT_SECRET=mcp-secret\n",
+                encoding="utf-8",
+            )
+            skill_env = skill_dir / ".env"
+            with patch.object(credentials, "DEFAULT_ENV_DIR", skill_dir), patch.object(
+                credentials, "DEFAULT_ENV_FILE", skill_env
+            ):
+                os.environ.pop("LEGIFRANCE_ENV_FILE", None)
+                os.environ.pop("LEGIFRANCE_CLIENT_ID", None)
+                os.environ.pop("LEGIFRANCE_CLIENT_SECRET", None)
+                self.assertEqual(credentials.env_file_candidates(), [skill_env])
+                self.assertIsNone(credentials.resolved_env_file())
+                self.assertEqual(credentials.target_env_file(), skill_env)
+                self.assertEqual(credentials.read_env_file(), {})
+                self.assertFalse(credentials.credentials_configured())
+
 
 if __name__ == "__main__":
     unittest.main()

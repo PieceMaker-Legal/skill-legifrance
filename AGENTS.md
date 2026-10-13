@@ -10,9 +10,8 @@ ou arborescence tierce.
 ## Mission
 
 Exposer les sources juridiques officielles françaises par un script CLI.
-Préserver la fidélité des sources, la reproductibilité, la télémétrie des
-recherches exhaustives et le signalement explicite des échecs. Les
-conclusions de droit restent à l'appelant.
+Préserver la fidélité des sources, la reproductibilité et le signalement
+explicite des échecs. Les conclusions de droit restent à l'appelant.
 
 ## Contrat d'exécution
 
@@ -29,9 +28,7 @@ conclusions de droit restent à l'appelant.
   `LEGIFRANCE_CLIENT_SECRET`.
 - Optionnel : `LEGIFRANCE_ENV=production|sandbox`, `LEGIFRANCE_DEBUG=1`,
   `LEGIFRANCE_ENV_FILE=/chemin/absolu/.env`.
-- Fichiers d'identifiants acceptés, dans cet ordre si
-  `LEGIFRANCE_ENV_FILE` est absent : `~/.config/skill-legifrance/.env`
-  puis `~/.config/mcp-legifrance/.env`.
+- Fichier d'identifiants par défaut : `~/.config/skill-legifrance/.env`.
 - Ne jamais imprimer identifiants, jetons OAuth, en-têtes d'autorisation
   ou contenu confidentiel.
 
@@ -39,7 +36,8 @@ conclusions de droit restent à l'appelant.
 
 ```text
 skill-legifrance/              # dépôt GitHub
-├── SKILL.md                   # contrat Agent Skills (name: legifrance)
+├── SKILL.md                   # contrat métier Agent Skills (name: legifrance)
+├── references/installation.md # venv, client PISTE (renvoi depuis SKILL.md)
 ├── .claude-plugin/            # plugin + marketplace Claude Code
 ├── scripts/legifrance.py      # CLI (dont setup PISTE)
 ├── config/mcp_definitions.py  # schémas des commandes
@@ -47,7 +45,6 @@ skill-legifrance/              # dépôt GitHub
 ├── tools/credentials.py       # guide PISTE, .env, contrôle OAuth
 ├── tools/handlers.py          # dispatch métier
 ├── tools/legifrance_client.py # frontière HTTP PISTE
-├── tools/research_corpus.py   # parcours exhaustif sans RAG
 ├── resources/                 # lexique API
 └── tests/                     # tests hors réseau
 ```
@@ -63,8 +60,7 @@ La logique de domaine reste dans `tools/`, pas dans la boucle CLI.
 
 Commandes publiques : `Search_Cour_Cassation`, `Search_Cour_Appel`,
 `Search_Conseil_Etat`, `Search_CAA`, `Search_Premiere_Instance`,
-`Search_Code`, `Build_Research_Corpus`. Ne pas rétablir
-`recherche_jurisprudence`.
+`Search_Code`. Ne pas rétablir `recherche_jurisprudence`.
 
 - guillemets = expression exacte : `"faute grave"`
 - `ET` plus prioritaire que `OU`
@@ -74,28 +70,6 @@ Commandes publiques : `Search_Cour_Cassation`, `Search_Cour_Appel`,
 - les références d'articles sont normalisées
 
 Contrat centralisé dans `config/mcp_definitions.py`, repris par le CLI.
-
-## Recherche exhaustive
-
-`Build_Research_Corpus` implémente un parcours sans RAG :
-
-- pas d'embeddings, de base vectorielle, de top-k sémantique ni de
-  présélection cachée ;
-- pagination de chaque requête jusqu'aux plafonds déclarés ;
-- déduplication par identifiant officiel Légifrance ;
-- téléchargement et scan de chaque décision disponible du manifeste ;
-- conservation de chaque échec de téléchargement et de chaque troncature ;
-- une fiche par décision téléchargée ; le code ne clôt que les textes qui
-  échouent un test booléen documenté, chaque candidat va au modèle ;
-- tous les contextes d'ancre des candidats, jamais un top-k de similarité ;
-- citations = sous-chaînes littérales de la source ;
-- validation statique des identifiants, de la cardinalité, du schéma et
-  des citations ;
-- les comptes de tokens par caractères sont des estimations, jamais un
-  usage fournisseur.
-
-Un score lexical peut ordonner un index d'audit ; il n'ôte aucune décision
-des lots ni du jeu de validation.
 
 ## Développement
 
@@ -118,9 +92,8 @@ python3 scripts/legifrance.py setup
 ```
 
 Pour un essai réseau : répertoire de sortie temporaire, rapporter les
-appels, les décisions identifiées/téléchargées/scannées/en échec, les
-plafonds et la méthode de tokens. Ne jamais committer identifiants,
-`.env`, corpus, journaux ou rapports générés.
+appels et les totaux. Ne jamais committer identifiants, `.env`, journaux
+ou rapports générés.
 
 ## Definition of done
 

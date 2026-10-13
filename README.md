@@ -66,8 +66,7 @@ python3 scripts/legifrance.py setup \
 
 Les identifiants sont écrits dans `~/.config/skill-legifrance/.env`
 (permissions 600). On peut aussi exporter `LEGIFRANCE_CLIENT_ID` /
-`LEGIFRANCE_CLIENT_SECRET`, ou poser `LEGIFRANCE_ENV_FILE`. Un fichier
-`~/.config/mcp-legifrance/.env` déjà présent est relu. `list`, `ping`,
+`LEGIFRANCE_CLIENT_SECRET`, ou poser `LEGIFRANCE_ENV_FILE`. `list`, `ping`,
 `--help`, `setup` et `dictionnaire_juridique` n'exigent pas d'identifiants.
 
 Dans Claude Code, le dossier de la skill est `${CLAUDE_SKILL_DIR}` :
@@ -99,5 +98,5 @@ PYTHONDONTWRITEBYTECODE=1 .venv/bin/python -m unittest discover -s tests -p 'tes
 python3 scripts/legifrance.py list
 ```
 
-Les tests sont hors réseau. Ne jamais versionner `.env`, jetons, corpus
-téléchargés, journaux ou rapports juridiques générés.
+Les tests sont hors réseau. Ne jamais versionner `.env`, jetons, journaux
+ou rapports juridiques générés.

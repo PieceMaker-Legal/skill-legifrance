@@ -24,7 +24,6 @@ PUBLIC_QUERY_TOOLS = {
     "Search_CAA": "query",
     "Search_Premiere_Instance": "query",
     "Search_Code": "query",
-    "Build_Research_Corpus": "query",
 }
 
 
@@ -64,27 +63,16 @@ class ResearchToolContractsTest(unittest.TestCase):
                 QUERY_DESCRIPTION,
             )
 
-    def test_build_corpus_exige_une_formulation_unique(self):
-        schema = self.tools["Build_Research_Corpus"]["inputSchema"]
-        self.assertEqual(schema["required"], ["question", "query"])
-        self.assertNotIn("queries", schema["properties"])
-        self.assertNotIn("max_decisions", schema["properties"])
-        self.assertNotIn("max_results_per_query", schema["properties"])
-
     def test_exception_premiere_instance_est_explicite_et_centralisee(self):
         description = self.tools["Search_Premiere_Instance"]["inputSchema"]["properties"]["query"]["description"]
         self.assertEqual(description, QUERY_PREMIERE_INSTANCE_DESCRIPTION)
         self.assertIn("reliés par `OU`", description)
         self.assertIn("Sans `ET` ou `OU` explicite", description)
 
-    def test_particularites_code_et_build_corpus_sont_preservees(self):
+    def test_particularites_code_sont_preservees(self):
         code = self.tools["Search_Code"]["inputSchema"]["properties"]
         self.assertIn("NUM_ARTICLE", code["query"]["description"])
         self.assertIn("version d'un article valable à une date passée", code["date"]["description"])
-
-        build = self.tools["Build_Research_Corpus"]
-        self.assertIn("au-delà de 500 résultats", build["description"])
-        self.assertIn("distincte de la question de droit", build["inputSchema"]["properties"]["query"]["description"])
 
     def test_alias_recherche_jurisprudence_n_est_plus_routable(self):
         self.assertNotIn("recherche_jurisprudence", TOOL_HANDLERS)

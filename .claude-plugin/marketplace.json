@@ -12,7 +12,7 @@
       "name": "legifrance",
       "displayName": "Skill Legifrance",
       "source": "./",
-      "description": "Recherche Légifrance, consultation de décisions, BODACC, lexique justice.fr et corpus jurisprudentiels auditables.",
+      "description": "Recherche Légifrance, consultation de décisions, BODACC et lexique justice.fr.",
       "homepage": "https://github.com/PieceMaker-Legal/skill-legifrance",
       "strict": false
     }

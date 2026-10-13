@@ -8,7 +8,6 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 sys.path.insert(0, ROOT)
 
 from tools.legifrance_client import est_date_absente, borne_haute_reelle
-from tools import research_corpus
 from tools.handlers import handle_search_conseil_etat
 
 
@@ -44,17 +43,6 @@ class EstDateAbsenteTest(unittest.TestCase):
         self.assertFalse(est_date_absente("en vigueur"))
 
 
-class FormatDateResearchCorpusTest(unittest.TestCase):
-    def test_sentinelle_en_millisecondes_rend_chaine_vide(self):
-        self.assertEqual(research_corpus._format_date(32472144000000), "")
-
-    def test_sentinelle_en_chaine_rend_chaine_vide(self):
-        self.assertEqual(research_corpus._format_date("2999-01-01"), "")
-
-    def test_date_normale_en_millisecondes_est_formatee(self):
-        self.assertEqual(research_corpus._format_date(1113177600000), "2005-04-11")
-
-
 class BorneHauteReelleTest(unittest.TestCase):
     def test_sentinelle_chaine_devient_derniere_date_reelle(self):
         self.assertEqual(borne_haute_reelle("2999-01-01"), "2998-12-31")
@@ -69,16 +57,6 @@ class BorneHauteReelleTest(unittest.TestCase):
 
     def test_date_reelle_est_inchangee(self):
         self.assertEqual(borne_haute_reelle("2026-09-03"), "2026-09-03")
-
-
-class DateFilterResearchCorpusTest(unittest.TestCase):
-    def test_borne_haute_sentinelle_est_normalisee_dans_le_filtre(self):
-        filtres = research_corpus._date_filter("2020-01-01", "2999-01-01")
-        self.assertEqual(filtres[0]["dates"]["end"], "2998-12-31")
-
-    def test_absence_de_borne_haute_ne_cree_aucune_cle_end(self):
-        filtres = research_corpus._date_filter("2020-01-01", None)
-        self.assertNotIn("end", filtres[0]["dates"])
 
 
 class HandlerBorneHauteTest(unittest.TestCase):

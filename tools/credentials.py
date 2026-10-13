@@ -20,7 +20,6 @@ PISTE_ENVIRONMENTS = {
 
 DEFAULT_ENV_DIR = Path.home() / ".config" / "skill-legifrance"
 DEFAULT_ENV_FILE = DEFAULT_ENV_DIR / ".env"
-MCP_ENV_FILE = Path.home() / ".config" / "mcp-legifrance" / ".env"
 
 CREDENTIAL_KEYS = (
     "LEGIFRANCE_CLIENT_ID",
@@ -55,7 +54,7 @@ def env_file_candidates() -> List[Path]:
     explicit = (os.environ.get("LEGIFRANCE_ENV_FILE") or "").strip()
     if explicit:
         return [Path(explicit).expanduser()]
-    return [DEFAULT_ENV_FILE, MCP_ENV_FILE]
+    return [DEFAULT_ENV_FILE]
 
 
 def target_env_file() -> Path:
