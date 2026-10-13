@@ -5,6 +5,8 @@
 import os
 from dotenv import load_dotenv
 
+from tools.credentials import PISTE_ENVIRONMENTS
+
 MCP_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Priorité à l'environnement du processus. Accepte aussi un `.env` dans le
@@ -19,9 +21,9 @@ load_dotenv(os.path.join(MCP_ROOT, '.env'), override=False)
 # SECURITY: pas de valeur par défaut. Les identifiants précédemment codés en
 # dur ici ont été committés dans un dépôt public et sont considérés comme
 # compromis — ils ne doivent jamais être réintroduits, même en fallback.
-# Si absents, le serveur démarre quand même (initialize/tools/list
-# fonctionnent) ; seul un appel d'outil échoue, avec un message clair en
-# français, sans requête réseau (voir tools/legifrance_client.py::_get_token).
+# Si absents, list/ping/setup/--help fonctionnent ; seul un appel Légifrance
+# échoue, avec un message clair, sans requête réseau
+# (voir tools/legifrance_client.py::_get_token).
 def _credential(name):
     """
     Lit un identifiant, en traitant comme absent une valeur vide OU une
@@ -45,14 +47,9 @@ LEGIFRANCE_CLIENT_SECRET = _credential('LEGIFRANCE_CLIENT_SECRET_PLUGIN') or _cr
 LEGIFRANCE_ENV = (os.getenv('LEGIFRANCE_ENV') or 'production').strip().lower()
 _SANDBOX = LEGIFRANCE_ENV == 'sandbox'
 
-LEGIFRANCE_OAUTH_URL = (
-    "https://sandbox-oauth.piste.gouv.fr/api/oauth/token" if _SANDBOX
-    else "https://oauth.piste.gouv.fr/api/oauth/token"
-)
-LEGIFRANCE_API_URL = (
-    "https://sandbox-api.piste.gouv.fr/dila/legifrance/lf-engine-app" if _SANDBOX
-    else "https://api.piste.gouv.fr/dila/legifrance/lf-engine-app"
-)
+_PISTE = PISTE_ENVIRONMENTS["sandbox" if _SANDBOX else "production"]
+LEGIFRANCE_OAUTH_URL = _PISTE["oauth"]
+LEGIFRANCE_API_URL = _PISTE["api"]
 
 # BODACC (API publique, sans authentification)
 BODACC_API_URL = "https://bodacc-datadila.opendatasoft.com/api/v2/catalog/datasets/annonces-commerciales/records"

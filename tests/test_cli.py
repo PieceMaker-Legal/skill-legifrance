@@ -32,7 +32,9 @@ class CliTest(unittest.TestCase):
         self.assertEqual(stderr, "")
         names = {line.split("\t", 1)[0] for line in stdout.splitlines() if line.strip()}
         announced = {tool["name"] for tool in MCP_TOOLS}
-        self.assertEqual(names, announced)
+        self.assertTrue(announced.issubset(names))
+        self.assertIn("setup", names)
+        self.assertIn("ping", names)
         self.assertIn("Formule une seule requête", INITIALIZE_INSTRUCTIONS)
 
     def test_ping(self):
@@ -51,6 +53,7 @@ class CliTest(unittest.TestCase):
         self.assertEqual(caught.exception.code, 0)
         help_text = stdout.getvalue() + stderr.getvalue()
         self.assertIn("Search_Cour_Cassation", help_text)
+        self.assertIn("setup", help_text)
         self.assertIn("Formule une seule requête", help_text)
         self.assertNotIn("LEGIFRANCE_CLIENT_SECRET", help_text)
 

@@ -84,9 +84,8 @@ class LegifranceClient:
         # even without credentials configured; only tool calls are affected.
         if not self.client_id or not self.client_secret:
             raise Exception(
-                "Identifiants Légifrance manquants (LEGIFRANCE_CLIENT_ID / LEGIFRANCE_CLIENT_SECRET absents). "
-                "Créez une application PISTE, souscrivez à l'API Légifrance, puis fournissez ces variables "
-                "dans l'environnement du serveur ou dans son fichier .env local."
+                "Identifiants Légifrance manquants. "
+                "Lancez : python3 scripts/legifrance.py setup"
             )
 
         if self.access_token and self.token_expires_at:

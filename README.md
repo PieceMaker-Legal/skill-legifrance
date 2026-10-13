@@ -18,27 +18,26 @@ git clone https://github.com/PieceMaker-Legal/skill-legifrance.git \
 ```
 
 Au premier appel, le script crée un `.venv` local et installe
-`requirements.txt` :
+`requirements.txt`. La mise en place du client PISTE est une commande
+de la skill :
 
 ```sh
-python3 scripts/legifrance.py ping
-python3 scripts/legifrance.py list
+python3 scripts/legifrance.py setup
 ```
 
-## Configuration
+Le guide d'inscription PISTE s'affiche (compte, application, souscription
+API Légifrance, client OAuth). Ensuite, avec les identifiants obtenus :
 
-Créer `~/.config/skill-legifrance/.env` (permissions utilisateur) :
-
-```dotenv
-LEGIFRANCE_CLIENT_ID=...
-LEGIFRANCE_CLIENT_SECRET=...
-LEGIFRANCE_ENV=production
+```sh
+python3 scripts/legifrance.py setup \
+  --client-id '…' --client-secret '…' --env production --check
 ```
 
-On peut aussi exporter ces variables, ou poser
-`LEGIFRANCE_ENV_FILE=/chemin/absolu/.env`. Un fichier
+Les identifiants sont écrits dans `~/.config/skill-legifrance/.env`
+(permissions 600). On peut aussi exporter `LEGIFRANCE_CLIENT_ID` /
+`LEGIFRANCE_CLIENT_SECRET`, ou poser `LEGIFRANCE_ENV_FILE`. Un fichier
 `~/.config/mcp-legifrance/.env` déjà présent est relu. `list`, `ping`,
-`--help` et `dictionnaire_juridique` n'exigent pas d'identifiants.
+`--help`, `setup` et `dictionnaire_juridique` n'exigent pas d'identifiants.
 
 ## Usage
 

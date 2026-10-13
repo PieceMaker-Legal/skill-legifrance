@@ -18,8 +18,11 @@ conclusions de droit restent à l'appelant.
 
 - Point d'entrée : `scripts/legifrance.py`.
 - stdout reçoit le résultat de la commande ; tout journal va sur stderr.
-- `list`, `ping`, `--help` et `dictionnaire_juridique` fonctionnent sans
-  identifiants. Seuls les appels réseau peuvent échouer pour ce motif.
+- `list`, `ping`, `setup`, `--help` et `dictionnaire_juridique`
+  fonctionnent sans identifiants. Seuls les appels Légifrance les exigent.
+- La mise en place du client PISTE est `scripts/legifrance.py setup`
+  (`tools/credentials.py`) : guide d'inscription, écriture de
+  `~/.config/skill-legifrance/.env` (mode 600), contrôle OAuth `--check`.
 - Configuration : variables d'environnement ou `.env` local, jamais un
   fichier d'installateur.
 - Requis pour Légifrance : `LEGIFRANCE_CLIENT_ID` et
@@ -37,9 +40,10 @@ conclusions de droit restent à l'appelant.
 ```text
 skill-legifrance/
 ├── SKILL.md                   # contrat agent
-├── scripts/legifrance.py      # CLI
+├── scripts/legifrance.py      # CLI (dont setup PISTE)
 ├── config/mcp_definitions.py  # schémas des commandes
 ├── config/settings.py         # environnement et endpoints
+├── tools/credentials.py       # guide PISTE, .env, contrôle OAuth
 ├── tools/handlers.py          # dispatch métier
 ├── tools/legifrance_client.py # frontière HTTP PISTE
 ├── tools/research_corpus.py   # parcours exhaustif sans RAG
@@ -105,6 +109,7 @@ des lots ni du jeu de validation.
 PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 scripts/legifrance.py list
 python3 scripts/legifrance.py ping
+python3 scripts/legifrance.py setup
 ```
 
 Pour un essai réseau : répertoire de sortie temporaire, rapporter les

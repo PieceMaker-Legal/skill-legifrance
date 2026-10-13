@@ -89,15 +89,13 @@ def bootstrap() -> None:
 
 
 def configure_environment() -> None:
+    from tools.credentials import resolved_env_file
+
     if os.environ.get("LEGIFRANCE_ENV_FILE"):
         return
-    for candidate in (
-        Path.home() / ".config" / "skill-legifrance" / ".env",
-        Path.home() / ".config" / "mcp-legifrance" / ".env",
-    ):
-        if candidate.is_file():
-            os.environ["LEGIFRANCE_ENV_FILE"] = str(candidate)
-            return
+    found = resolved_env_file()
+    if found is not None:
+        os.environ["LEGIFRANCE_ENV_FILE"] = str(found)
 
 
 def ensure_runtime(argv: List[str]) -> None:
@@ -189,6 +187,35 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ping_parser.set_defaults(_meta="ping")
 
+    setup_parser = subparsers.add_parser(
+        "setup",
+        parents=[common],
+        help="Guide PISTE, enregistrement du client OAuth, contrôle du jeton.",
+        description=(
+            "Crée le client PISTE local : guide d'inscription, écriture de "
+            "~/.config/skill-legifrance/.env, vérification OAuth optionnelle."
+        ),
+    )
+    setup_parser.add_argument("--client-id", dest="client_id", help="Identifiant OAuth PISTE.")
+    setup_parser.add_argument(
+        "--client-secret",
+        dest="client_secret",
+        help="Secret OAuth PISTE. Ne s'affiche pas dans la sortie.",
+    )
+    setup_parser.add_argument(
+        "--env",
+        dest="piste_env",
+        choices=sorted({"production", "sandbox"}),
+        default="production",
+        help="Environnement PISTE. production et sandbox ont des identifiants distincts.",
+    )
+    setup_parser.add_argument(
+        "--check",
+        action="store_true",
+        help="Demande un jeton OAuth après enregistrement, ou pour un client déjà posé.",
+    )
+    setup_parser.set_defaults(_meta="setup")
+
     for tool in MCP_TOOLS:
         sub = subparsers.add_parser(
             tool["name"],
@@ -237,6 +264,57 @@ def render_text(result: Dict[str, Any]) -> str:
     return text
 
 
+def run_setup(namespace: argparse.Namespace) -> int:
+    from tools.credentials import (
+        PISTE_GUIDE,
+        credentials_configured,
+        read_env_file,
+        status_lines,
+        verify_oauth,
+        write_credentials,
+    )
+
+    client_id = (getattr(namespace, "client_id", None) or "").strip()
+    client_secret = (getattr(namespace, "client_secret", None) or "").strip()
+    env_name = (getattr(namespace, "piste_env", None) or "production").strip().lower()
+    check = bool(getattr(namespace, "check", False))
+
+    if (client_id and not client_secret) or (client_secret and not client_id):
+        print("setup exige --client-id et --client-secret ensemble.", file=sys.stderr)
+        return 2
+
+    if client_id and client_secret:
+        path = write_credentials(client_id, client_secret, env=env_name)
+        os.environ["LEGIFRANCE_ENV_FILE"] = str(path)
+        print(f"Client PISTE enregistré dans {path} (permissions 600).")
+        print("\n".join(status_lines()))
+        if check:
+            ok, message = verify_oauth(client_id, client_secret, env_name)
+            print(message)
+            return 0 if ok else 1
+        return 0
+
+    print(PISTE_GUIDE.rstrip())
+    print()
+    print("\n".join(status_lines()))
+    if check:
+        values = read_env_file()
+        stored_id = (os.environ.get("LEGIFRANCE_CLIENT_ID") or values.get("LEGIFRANCE_CLIENT_ID") or "").strip()
+        stored_secret = (
+            os.environ.get("LEGIFRANCE_CLIENT_SECRET") or values.get("LEGIFRANCE_CLIENT_SECRET") or ""
+        ).strip()
+        stored_env = (
+            os.environ.get("LEGIFRANCE_ENV") or values.get("LEGIFRANCE_ENV") or env_name
+        ).strip().lower()
+        if not stored_id or not stored_secret:
+            print("Contrôle OAuth impossible : identifiants manquants.", file=sys.stderr)
+            return 1
+        ok, message = verify_oauth(stored_id, stored_secret, stored_env)
+        print(message)
+        return 0 if ok else 1
+    return 0 if credentials_configured() else 1
+
+
 def run_tool(name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
     from tools.handlers import handle_tool_call
 
@@ -248,12 +326,16 @@ def dispatch(namespace: argparse.Namespace) -> int:
     if meta == "list":
         from config.mcp_definitions import MCP_TOOLS
 
+        print("setup\tGuide PISTE, enregistrement du client OAuth, contrôle du jeton.")
+        print("ping\tVérifie que le script démarre, sans appel réseau.")
         for tool in MCP_TOOLS:
             print(f"{tool['name']}\t{tool.get('description', '').splitlines()[0]}")
         return 0
     if meta == "ping":
         print("ok")
         return 0
+    if meta == "setup":
+        return run_setup(namespace)
 
     name = getattr(namespace, "_tool", None)
     if not name:

@@ -10,12 +10,29 @@ Les sources officielles passent par le script `scripts/legifrance.py`. Les sché
 Depuis la racine de cette skill :
 
 ```sh
+python3 scripts/legifrance.py setup
 python3 scripts/legifrance.py --help
 python3 scripts/legifrance.py list
-python3 scripts/legifrance.py Search_Cour_Cassation --help
 ```
 
-Le script crée un `.venv` local au premier appel. Les identifiants PISTE sont lus dans `LEGIFRANCE_CLIENT_ID` / `LEGIFRANCE_CLIENT_SECRET`, ou dans `LEGIFRANCE_ENV_FILE`, sinon `~/.config/skill-legifrance/.env` puis `~/.config/mcp-legifrance/.env`. `list`, `ping`, `--help` et `dictionnaire_juridique` fonctionnent sans identifiants.
+Le script crée un `.venv` local au premier appel.
+
+## Client PISTE
+
+Toute recherche Légifrance exige un client OAuth PISTE. `setup` en est le contrat : guide d'inscription, fichier d'identifiants, contrôle du jeton.
+
+1. Lancer `python3 scripts/legifrance.py setup` (sans identifiants : imprime le guide officiel et l'état).
+2. Faire créer le compte et l'application sur https://piste.gouv.fr/ (souscription API Légifrance, génération OAuth). Production et sandbox ont des identifiants distincts.
+3. Demander à l'utilisateur le `client_id` et le `client_secret`, puis les enregistrer sans les réafficher :
+
+```sh
+python3 scripts/legifrance.py setup \
+  --client-id '…' --client-secret '…' --env production --check
+```
+
+Le fichier écrit est `~/.config/skill-legifrance/.env` (permissions 600), sauf si `LEGIFRANCE_ENV_FILE` pointe ailleurs. Un `~/.config/mcp-legifrance/.env` déjà présent est relu. Ne jamais imprimer le secret, un jeton OAuth ou un en-tête d'autorisation.
+
+Si un appel Légifrance échoue pour identifiants manquants, relancer `setup`. `list`, `ping`, `--help`, `setup` et `dictionnaire_juridique` fonctionnent sans client PISTE.
 
 ## Requête
 
