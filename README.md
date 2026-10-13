@@ -8,14 +8,45 @@ Ce dépôt reprend le cœur métier de
 [mcp-legifrance](https://github.com/PieceMaker-Legal/mcp-legifrance) et
 remplace le transport MCP stdio par `scripts/legifrance.py`.
 
-## Installation
+Le format suit la [spécification Agent Skills](https://agentskills.io/specification)
+et le packaging [plugin Claude Code](https://code.claude.com/docs/en/skills) :
+`SKILL.md` à la racine (`name: legifrance`), scripts dans `scripts/`,
+manifestes dans `.claude-plugin/`.
 
-Cloner le dépôt dans un répertoire de skills, par exemple :
+## Installation Claude Code
+
+Le dossier de la skill doit s'appeler `legifrance` (le champ `name` du
+`SKILL.md`). Le dépôt GitHub s'appelle `skill-legifrance` ; cloner dans
+un répertoire nommé `legifrance`.
+
+### Plugin (recommandé)
+
+Dans Claude Code :
+
+```text
+/plugin marketplace add PieceMaker-Legal/skill-legifrance
+/plugin install legifrance@skill-legifrance
+```
+
+La commande est alors `/legifrance`.
+
+### Skill personnelle
+
+```sh
+git clone https://github.com/PieceMaker-Legal/skill-legifrance.git \
+  ~/.claude/skills/legifrance
+```
+
+Pour un projet : même clone dans `.claude/skills/legifrance`.
+
+## Autres agents (Grok, etc.)
 
 ```sh
 git clone https://github.com/PieceMaker-Legal/skill-legifrance.git \
   ~/.grok/skills/legifrance
 ```
+
+## Client PISTE
 
 Au premier appel, le script crée un `.venv` local et installe
 `requirements.txt`. La mise en place du client PISTE est une commande
@@ -38,6 +69,12 @@ Les identifiants sont écrits dans `~/.config/skill-legifrance/.env`
 `LEGIFRANCE_CLIENT_SECRET`, ou poser `LEGIFRANCE_ENV_FILE`. Un fichier
 `~/.config/mcp-legifrance/.env` déjà présent est relu. `list`, `ping`,
 `--help`, `setup` et `dictionnaire_juridique` n'exigent pas d'identifiants.
+
+Dans Claude Code, le dossier de la skill est `${CLAUDE_SKILL_DIR}` :
+
+```sh
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py setup
+```
 
 ## Usage
 

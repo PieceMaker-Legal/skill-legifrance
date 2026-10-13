@@ -1,18 +1,22 @@
 ---
 name: legifrance
 description: Rechercher et consulter les sources juridiques officielles françaises (Légifrance, PISTE, BODACC, lexique justice.fr). À utiliser pour une recherche de jurisprudence, un article de code, une décision JURITEXT/CETATEXT, un corpus exhaustif, le BODACC, le dictionnaire juridique, ou /legifrance.
+compatibility: Requires Python 3 and HTTPS access to PISTE (oauth.piste.gouv.fr, api.piste.gouv.fr)
+metadata:
+  author: PieceMaker Legal
+  version: "1.0.0"
 ---
 
 # Skill Legifrance
 
-Les sources officielles passent par le script `scripts/legifrance.py`. Les schémas et drapeaux font autorité dans `--help` ; ne pas inventer de flag.
+Les sources officielles passent par `scripts/legifrance.py`. Les schémas et drapeaux font autorité dans `--help` ; ne pas inventer de flag.
 
-Depuis la racine de cette skill :
+Le dossier de la skill est celui qui contient ce `SKILL.md`. Claude Code le fournit dans `${CLAUDE_SKILL_DIR}`. Si la variable est vide, exécuter depuis ce dossier.
 
 ```sh
-python3 scripts/legifrance.py setup
-python3 scripts/legifrance.py --help
-python3 scripts/legifrance.py list
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py setup
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py --help
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py list
 ```
 
 Le script crée un `.venv` local au premier appel.
@@ -21,12 +25,12 @@ Le script crée un `.venv` local au premier appel.
 
 Toute recherche Légifrance exige un client OAuth PISTE. `setup` en est le contrat : guide d'inscription, fichier d'identifiants, contrôle du jeton.
 
-1. Lancer `python3 scripts/legifrance.py setup` (sans identifiants : imprime le guide officiel et l'état).
+1. Lancer `python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py setup` (sans identifiants : imprime le guide officiel et l'état).
 2. Faire créer le compte et l'application sur https://piste.gouv.fr/ (souscription API Légifrance, génération OAuth). Production et sandbox ont des identifiants distincts.
 3. Demander à l'utilisateur le `client_id` et le `client_secret`, puis les enregistrer sans les réafficher :
 
 ```sh
-python3 scripts/legifrance.py setup \
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py setup \
   --client-id '…' --client-secret '…' --env production --check
 ```
 
@@ -66,13 +70,13 @@ Au-delà de 500 résultats, l'appel est refusé : resserrer la requête.
 Exemple :
 
 ```sh
-python3 scripts/legifrance.py Search_Cour_Cassation \
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py Search_Cour_Cassation \
   --query '("faute grave" OU "faute lourde") ET licenciement' \
   --matiere SOCIAL
-python3 scripts/legifrance.py consulter_decision --text_id JURITEXT000007000000
+python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py consulter_decision --text_id JURITEXT000007000000
 ```
 
-Les tableaux et les drapeaux détaillés : `python3 scripts/legifrance.py <commande> --help`.
+Les tableaux et les drapeaux détaillés : `python3 ${CLAUDE_SKILL_DIR}/scripts/legifrance.py <commande> --help`.
 
 ## Conduite
 

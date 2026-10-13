@@ -1,0 +1,20 @@
+{
+  "name": "skill-legifrance",
+  "owner": {
+    "name": "PieceMaker Legal"
+  },
+  "metadata": {
+    "description": "Skill Legifrance — sources juridiques officielles françaises via Légifrance/PISTE.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "legifrance",
+      "displayName": "Skill Legifrance",
+      "source": "./",
+      "description": "Recherche Légifrance, consultation de décisions, BODACC, lexique justice.fr et corpus jurisprudentiels auditables.",
+      "homepage": "https://github.com/PieceMaker-Legal/skill-legifrance",
+      "strict": false
+    }
+  ]
+}

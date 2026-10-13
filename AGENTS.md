@@ -38,8 +38,9 @@ conclusions de droit restent à l'appelant.
 ## Architecture
 
 ```text
-skill-legifrance/
-├── SKILL.md                   # contrat agent
+skill-legifrance/              # dépôt GitHub
+├── SKILL.md                   # contrat Agent Skills (name: legifrance)
+├── .claude-plugin/            # plugin + marketplace Claude Code
 ├── scripts/legifrance.py      # CLI (dont setup PISTE)
 ├── config/mcp_definitions.py  # schémas des commandes
 ├── config/settings.py         # environnement et endpoints
@@ -50,6 +51,10 @@ skill-legifrance/
 ├── resources/                 # lexique API
 └── tests/                     # tests hors réseau
 ```
+
+Le champ `name` de `SKILL.md` est `legifrance` : le dossier d'installation
+(`~/.claude/skills/legifrance`, `.claude/skills/legifrance`) doit porter
+ce nom. Le dépôt GitHub peut s'appeler `skill-legifrance`.
 
 Les schémas, le CLI, les handlers, les tests et `SKILL.md` restent alignés.
 La logique de domaine reste dans `tools/`, pas dans la boucle CLI.
